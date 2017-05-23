@@ -1,5 +1,8 @@
 //funckje
 
+//stworzenie socket descriptora
+socket_desc = socket(AF_INET, SOCK_STREAM, 0);
+
 bind (int socket_descriptor,
       (struct sockaddr*) &server_addr,
       sizeof(server_addr));
