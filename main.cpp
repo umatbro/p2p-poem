@@ -5,47 +5,24 @@
 #include <unistd.h> //write
 #include <string.h>
 #include <pthread.h>
+#include <thread>
 #include "functions.h"
 
-void *get_response_from_ip(char* ip, int port_number){
-  int socket_descriptor;
-  struct sockaddr_in serv_addr;
-  struct hostent *server;
-  int buffer_size = 200;
-  char buffer[buffer_size] = {0};
-
-  socket_descriptor = socket(AF_INET, SOCK_STREAM, 0);
-  if (socket_descriptor < 0){
-    printf("Error creating socket\n");
-    return 0;
-  }
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(port_number);
-  serv_addr.sin_addr.s_addr =  inet_addr(ip);//INADDR_ANY;
-
-
-  if(connect(socket_descriptor, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == 0){
-    printf("Connected to the server %s:%d\n", ip, port_number);
-  }
-  char message[buffer_size];
-  while(*buffer == 0){
-    recv(socket_descriptor, buffer, buffer_size, 0);
-    strcpy(message,buffer);
-    if(strcmp(buffer,"exit") != 0) {
-      //clear array
-      for(int i = 0; i < buffer_size; i++){
-        buffer[i] = 0;
-      }
-    }
-
-    printf("received message: %s\n", message);
-  }
-  write(socket_descriptor, "odp", 4);
-
-  close(socket_descriptor);
-}
 
 int main(int argc, char* argv[]){
-  get_response_from_ip("192.168.0.199", 10554);
+  if(argc != 2){
+    printf("Usage: ./p2p <port_number>\n");
+    return 0;
+  }
+  int port_num = atoi(argv[1]);
+  printf("Port number: %d\n", port_num);
+  char message[200] = {0};
+  std::thread server_thread(server, port_num);
+  std::thread menu(disp_menu);
+  // get_response_from_ip("192.168.0.19", port_num, message);
+  // printf("message: %d. %s\n", message[0], &message[1]);
+  // printf("%d\n", test);
+
+  server_thread.join();
   return 0;
 }

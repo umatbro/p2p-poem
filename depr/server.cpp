@@ -41,13 +41,16 @@ int main(int argc, char* argv[]){
       printf("Error on accept (server)\n");
       return 0;
     }
-    int message_size = 200;
-    char message[message_size] = {0};
-    message[0] = 6;
-    strcpy(&message[1], "gdyś jej ścieżki powycinał żelaznymi łzami.");
-    write(client_socket_descriptor, message, message_size);
+    else {
+      int message_size = 200;
+      char message[message_size] = {0};
+      message[0] = 6;
+      strcpy(&message[1], "gdyś jej ścieżki powycinał żelaznymi łzami.");
+      write(client_socket_descriptor, message, message_size);
+      printf("Sent poem verse to peer on ip adress: %s\n", inet_ntoa(cli_addr.sin_addr));
+      close(client_socket_descriptor);
+    }
   }
-  close(client_socket_descriptor);
   close(socket_descriptor);
   return 0;
 }

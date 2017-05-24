@@ -9,8 +9,10 @@
 #include <string.h>
 #include <pthread.h>
 
-void *get_response_from_ip(char* ip, int port_number, char* response);
-
+extern int test;
+void get_response_from_ip(char* ip, int port_number, char* response);
+void server(int port_number);
+void disp_menu();
 
 
 
