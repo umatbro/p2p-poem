@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <thread>
 #include "functions.h"
+#include "poem.h"
 
 
 int main(int argc, char* argv[]){
@@ -16,12 +17,18 @@ int main(int argc, char* argv[]){
   }
   int port_num = atoi(argv[1]);
   printf("Port number: %d\n", port_num);
-  char message[200] = {0};
+
+  // dodaj znany wiersz to tablicy
+  init_poem();
+  // printf("Zaczynam przeszukiwać adresy: 192.160.102.*\n");
+  // char response[LINE_LENGTH] = {0};
+  // std::thread t(get_response_from_ip, (char*)"192.168.0.199", 10000, response);
+  // t.join();
+  // printf("%s - wynik\n", response);
+  // add_verse(response[0], &response[1]);
+
   std::thread server_thread(server, port_num);
-  std::thread menu(disp_menu);
-  // get_response_from_ip("192.168.0.19", port_num, message);
-  // printf("message: %d. %s\n", message[0], &message[1]);
-  // printf("%d\n", test);
+  std::thread menu(disp_menu, port_num);
 
   server_thread.join();
   return 0;

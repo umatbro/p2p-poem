@@ -13,7 +13,7 @@ extern int verses_found;
 // wynikowa tablica z wierszem
 void show_poem();
 void init_poem();
-
+void add_verse(int, char*);
 
 #endif /* end of include guard:
  */

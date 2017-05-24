@@ -1,6 +1,5 @@
 #include "functions.h"
-
-int test = 10;
+#include "poem.h"
 
 void get_response_from_ip(char* ip, int port_number, char* response){
   int socket_descriptor;
@@ -16,16 +15,26 @@ void get_response_from_ip(char* ip, int port_number, char* response){
   }
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(port_number);
-  serv_addr.sin_addr.s_addr =  inet_addr(ip);//INADDR_ANY;
+  serv_addr.sin_addr.s_addr = inet_addr(ip);
 
 
   if(connect(socket_descriptor, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == 0){
     printf("<cli> Connected to the server %s:%d\n", ip, port_number);
+
+    /*https://stackoverflow.com/questions/37502281/c-sockets-close-connection-if-no-response*/
+    int ret;
+    fd_set set;
+    struct timeval timeout;
+    /* Initialize the file descriptor set. */
+    FD_ZERO(&set);
+    FD_SET(socket_descriptor, &set);
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+
     recv(socket_descriptor, buffer, buffer_size, 0);
     sprintf(response, "%s", buffer);
-    //printf("Response: \"%s\"", &response[1]);
   } else {
-    printf("Connection with %s:%d not succeeded\n", ip, port_number);
+    //printf("<cli> Connection with %s:%d not succeeded\n", ip, port_number);
   }
 
   close(socket_descriptor);
@@ -80,7 +89,7 @@ void server(int port_number){
   close(socket_descriptor);
 }
 
-void disp_menu(){
+void disp_menu(int port_number){
   char cmd[50] = {0};
 
   while(strcmp(cmd, "exit") != 0)
@@ -89,10 +98,51 @@ void disp_menu(){
     memset(cmd, 0, sizeof(cmd));
     scanf("%s",cmd);
     if(strcmp(cmd,"help") == 0){
-      printf("POMOC\n----------------");
-      printf("\nDostepne komendy:\nexit - wyjscie z programu\n\n");
+      printf("------------------------------------\n");
+      printf("POMOC\n");
+      printf("Dostepne komendy:\n");
+      printf("show - pokaż dotychczas zebrana tresc wiersza\n");
+      printf("search - szukaj wersow p2p\n");
+      printf("exit - wyjscie z programu\n");
+      printf("------------------------------------\n");
+    }
+    else if (strcmp(cmd,"search") == 0) {
+      printf("Zaczynam przeszukiwać adresy: 192.160.102.*\n");
+      char ip[] = "192.168.0.";
+      search_range(ip, port_number, 50, 170);
+    }
+    else if (strcmp(cmd,"show") == 0){
+      show_poem();
+    }
+    else {
+      printf("Bledna komenda. Wpisz \"help\" po pomoc.\n");
     }
   }
   std::terminate();
   return ;
+}
+
+void search_range(char *ip, int port_number, int range_begin, int range_end){
+  int threads_number = range_end - range_begin;
+  std::thread threads[threads_number];
+
+  char response[threads_number][LINE_LENGTH] = {0}; // tablica przechowująca wynik działania kazdego z wątków
+
+  int iterator = 0;
+  for(int i = range_begin; i <= range_end; i++){
+    char suffix[3];
+    sprintf(suffix, "%d", i);
+    char whole_ip[sizeof(ip) + 3];
+    strcpy(whole_ip, ip);
+    strcat(whole_ip, suffix);
+    threads[iterator] = std::thread(get_response_from_ip, whole_ip, port_number, response[iterator]);
+    iterator++;
+  }
+  for(int i = 0; i < threads_number; i++){
+    threads[i].join();
+    if(strlen(response[i]) != 0){
+      add_verse(response[i][0], &response[i][1]);
+    }
+  }
+  printf("Zakonczono przeszukiwanie\n");
 }

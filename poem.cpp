@@ -18,3 +18,10 @@ void show_poem(){
   }
   printf("------------------------------------\n");
 }
+
+void add_verse(int verse_number, char* verse){
+  memset(poem[verse_number], 0, sizeof(poem[verse_number])); // najpierw wyczyść wers
+  // potem skopiuj treść wersu do miejsca w tablicy
+  strncpy(poem[verse_number], verse, sizeof(poem[verse_number]));
+  verses_found++;
+}
