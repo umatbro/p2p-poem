@@ -126,7 +126,7 @@ void disp_menu(int port_number){
     }
     else if (strcmp(cmd,"search") == 0) {
       printf("Zaczynam przeszukiwać adresy: 192.168.102.*\n");
-      char ip[] = "192.168.0.";
+      char ip[] = "192.168.102.";
       search_range(ip, port_number, RANGE_BEGIN, RANGE_END);
     }
     else if (strcmp(cmd,"show") == 0){
