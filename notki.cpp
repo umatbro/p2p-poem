@@ -5,6 +5,7 @@
   http://www.binarytides.com/socket-programming-c-linux-tutorial/
   http://www.linuxhowtos.org/C_C++/socket.htm
   https://solarianprogrammer.com/2011/12/16/cpp-11-thread-tutorial/   - wątki
+  https://stackoverflow.com/questions/37502281/c-sockets-close-connection-if-no-response
 
 
 */

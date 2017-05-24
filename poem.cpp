@@ -20,7 +20,10 @@ void show_poem(){
 }
 
 void add_verse(int verse_number, char* verse){
-  memset(poem[verse_number], 0, sizeof(poem[verse_number])); // najpierw wyczyść wers
+  if(strlen(poem[verse_number]) != 0) {
+    memset(poem[verse_number], 0, sizeof(poem[verse_number])); // najpierw wyczyść wers jeśli nie jest pusty
+    verse_number--;
+  }
   // potem skopiuj treść wersu do miejsca w tablicy
   strncpy(poem[verse_number], verse, sizeof(poem[verse_number]));
   verses_found++;

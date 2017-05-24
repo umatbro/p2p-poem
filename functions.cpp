@@ -1,7 +1,7 @@
 #include "functions.h"
 #include "poem.h"
 
-void get_response_from_ip(char* ip, int port_number, char* response){
+void get_response_from_ip(char ip[], int port_number, char* response){
   int socket_descriptor;
   struct sockaddr_in serv_addr;
   struct hostent *server;
@@ -16,7 +16,7 @@ void get_response_from_ip(char* ip, int port_number, char* response){
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(port_number);
   serv_addr.sin_addr.s_addr = inet_addr(ip);
-
+  printf("Trying to connect %s\n",ip);
 
   if(connect(socket_descriptor, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) == 0){
     printf("<cli> Connected to the server %s:%d\n", ip, port_number);
@@ -28,16 +28,34 @@ void get_response_from_ip(char* ip, int port_number, char* response){
     /* Initialize the file descriptor set. */
     FD_ZERO(&set);
     FD_SET(socket_descriptor, &set);
-    timeout.tv_sec = 5;
-    timeout.tv_usec = 0;
+    /* Initialize the timeout data structure. */
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 100;
+    /* select returns 0 if timeout, 1 if input available, -1 if error. */
+    ret = select(socket_descriptor+1, &set, NULL, NULL, &timeout);
+    if (ret == 1) {
+      memset(buffer, 0, sizeof(buffer));
+      recv(socket_descriptor, buffer, buffer_size, 0);
+      sprintf(response, "%s", buffer);
+      close(socket_descriptor);
+    }
+    else if (ret == 0) {
+      /*timeout*/
+      printf("<cli> Connection %s:%d timeout\n", ip, port_number);
+      close(socket_descriptor);
+      return;
+    }
+    else { printf("Error %s:%d\n", ip, port_number);}
 
-    recv(socket_descriptor, buffer, buffer_size, 0);
-    sprintf(response, "%s", buffer);
-  } else {
-    //printf("<cli> Connection with %s:%d not succeeded\n", ip, port_number);
+  }
+   else {
+  //   printf("<cli> Connection with %s:%d not succeeded\n", ip, port_number);
+    close(socket_descriptor);
+     return;
   }
 
   close(socket_descriptor);
+  return;
 }
 
 void server(int port_number){
@@ -107,9 +125,9 @@ void disp_menu(int port_number){
       printf("------------------------------------\n");
     }
     else if (strcmp(cmd,"search") == 0) {
-      printf("Zaczynam przeszukiwać adresy: 192.160.102.*\n");
+      printf("Zaczynam przeszukiwać adresy: 192.168.102.*\n");
       char ip[] = "192.168.0.";
-      search_range(ip, port_number, 50, 170);
+      search_range(ip, port_number, RANGE_BEGIN, RANGE_END);
     }
     else if (strcmp(cmd,"show") == 0){
       show_poem();
@@ -122,7 +140,7 @@ void disp_menu(int port_number){
   return ;
 }
 
-void search_range(char *ip, int port_number, int range_begin, int range_end){
+void search_range(char* ip, int port_number, int range_begin, int range_end){
   int threads_number = range_end - range_begin;
   std::thread threads[threads_number];
 
@@ -130,11 +148,14 @@ void search_range(char *ip, int port_number, int range_begin, int range_end){
 
   int iterator = 0;
   for(int i = range_begin; i <= range_end; i++){
-    char suffix[3];
+    char suffix[4];
     sprintf(suffix, "%d", i);
-    char whole_ip[sizeof(ip) + 3];
+    char whole_ip[sizeof(ip) + sizeof(suffix)];
     strcpy(whole_ip, ip);
     strcat(whole_ip, suffix);
+    // char whole_ip[20];
+    // sprintf(whole_ip, "%s%d", ip, i);
+    usleep(100000);
     threads[iterator] = std::thread(get_response_from_ip, whole_ip, port_number, response[iterator]);
     iterator++;
   }
@@ -142,6 +163,7 @@ void search_range(char *ip, int port_number, int range_begin, int range_end){
     threads[i].join();
     if(strlen(response[i]) != 0){
       add_verse(response[i][0], &response[i][1]);
+      show_poem();
     }
   }
   printf("Zakonczono przeszukiwanie\n");

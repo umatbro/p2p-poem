@@ -20,12 +20,6 @@ int main(int argc, char* argv[]){
 
   // dodaj znany wiersz to tablicy
   init_poem();
-  // printf("Zaczynam przeszukiwać adresy: 192.160.102.*\n");
-  // char response[LINE_LENGTH] = {0};
-  // std::thread t(get_response_from_ip, (char*)"192.168.0.199", 10000, response);
-  // t.join();
-  // printf("%s - wynik\n", response);
-  // add_verse(response[0], &response[1]);
 
   std::thread server_thread(server, port_num);
   std::thread menu(disp_menu, port_num);
