@@ -8,6 +8,7 @@
 #include <unistd.h> //write
 #include <string.h>
 #include <pthread.h>
+#include <thread>
 
 extern int test;
 void get_response_from_ip(char* ip, int port_number, char* response);

@@ -93,5 +93,6 @@ void disp_menu(){
       printf("\nDostepne komendy:\nexit - wyjscie z programu\n\n");
     }
   }
+  std::terminate();
   return ;
 }
