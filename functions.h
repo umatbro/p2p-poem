@@ -11,7 +11,7 @@
 #include <thread>
 
 #define RANGE_BEGIN 170
-#define RANGE_END 220
+#define RANGE_END 210
 
 void get_response_from_ip(char* ip, int port_number, char* response);
 void server(int port_number);

@@ -49,8 +49,8 @@ void get_response_from_ip(char ip[], int port_number, char* response){
 
   }
    else {
-  //   printf("<cli> Connection with %s:%d not succeeded\n", ip, port_number);
-    close(socket_descriptor);
+     printf("<cli> Connection with %s:%d not succeeded\n", ip, port_number);
+     close(socket_descriptor);
      return;
   }
 
@@ -109,9 +109,10 @@ void server(int port_number){
 
 void disp_menu(int port_number){
   char cmd[50] = {0};
-
+  std::thread t1;
   while(strcmp(cmd, "exit") != 0)
   {
+
     printf("cmd> ");
     memset(cmd, 0, sizeof(cmd));
     scanf("%s",cmd);
@@ -127,7 +128,7 @@ void disp_menu(int port_number){
     else if (strcmp(cmd,"search") == 0) {
       printf("Zaczynam przeszukiwać adresy: 192.168.102.*\n");
       char ip[] = "192.168.0.";
-      search_range(ip, port_number, RANGE_BEGIN, RANGE_END);
+      t1 = std::thread(search_range, ip, port_number, RANGE_BEGIN, RANGE_END);
     }
     else if (strcmp(cmd,"show") == 0){
       show_poem();
@@ -135,7 +136,9 @@ void disp_menu(int port_number){
     else {
       printf("Bledna komenda. Wpisz \"help\" po pomoc.\n");
     }
+
   }
+  t1.join();
   std::terminate();
   return ;
 }
@@ -160,11 +163,15 @@ void search_range(char* ip, int port_number, int range_begin, int range_end){
     iterator++;
   }
   for(int i = 0; i < threads_number; i++){
-    threads[i].join();
     if(strlen(response[i]) != 0){
       add_verse(response[i][0], &response[i][1]);
       show_poem();
     }
+    threads[i].join();
+    // if(strlen(response[i]) != 0){
+    //   add_verse(response[i][0], &response[i][1]);
+    //   show_poem();
+    // }
   }
   printf("Zakonczono przeszukiwanie\n");
 }
