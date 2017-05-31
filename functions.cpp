@@ -159,22 +159,11 @@ void search_range(char* ip, int port_number, int range_begin, int range_end){
 
   int iterator = 0;
   for(int i = range_begin; i <= range_end; i++){
-    // char suffix[4];
-    // sprintf(suffix, "%d", i);
-    // char whole_ip[sizeof(ip) + sizeof(suffix)];
-    // strcpy(whole_ip, ip);
-    // strcat(whole_ip, suffix);
-    // char whole_ip[20];
-    // sprintf(whole_ip, "%s%d", ip, i);
     usleep(100000);
     threads[iterator] = std::thread(get_response_from_ip, ip, i, port_number, response[iterator]);
     iterator++;
   }
   for(int i = 0; i < threads_number+1; i++){
-    // if(strlen(response[i]) != 0){
-    //   add_verse(response[i][0], &response[i][1]);
-    //   show_poem();
-    // }
     threads[i].join();
     if(strlen(response[i]) != 0){
       add_verse(response[i][0], &response[i][1]);
