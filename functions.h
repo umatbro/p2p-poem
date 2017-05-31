@@ -10,10 +10,10 @@
 #include <pthread.h>
 #include <thread>
 
-#define RANGE_BEGIN 170
-#define RANGE_END 210
+#define RANGE_BEGIN 50
+#define RANGE_END 150
 
-void get_response_from_ip(char* ip, int port_number, char* response);
+void get_response_from_ip(char* ip, int suffix, int port_number, char* response);
 void server(int port_number);
 void disp_menu(int port_number);
 void search_range(char* ip, int port_number, int range_begin, int range_end);
