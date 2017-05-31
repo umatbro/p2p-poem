@@ -119,9 +119,11 @@ void disp_menu(int port_number){
   std::thread t1;
   while(strcmp(cmd, "exit") != 0)
   {
+    int r_begin = 0;
+    int r_end = 0;
     printf("cmd> ");
     memset(cmd, 0, sizeof(cmd));
-    scanf("%s %d %d",cmd);
+    scanf("%s %d %d",cmd,&r_begin,&r_end);
     if(strcmp(cmd,"help") == 0){
       printf("------------------------------------\n");
       printf("POMOC\n");
@@ -134,7 +136,8 @@ void disp_menu(int port_number){
     else if (strcmp(cmd,"search") == 0) {
       printf("Zaczynam przeszukiwać adresy: 192.168.102.*\n");
       char ip[] = "192.168.0.";
-      t1 = std::thread(search_range, ip, port_number, RANGE_BEGIN, RANGE_END);
+      if(r_begin!=0 && r_end != 0) t1 = std::thread(search_range, ip, port_number, r_begin, r_end);
+      else t1 = std::thread(search_range, ip, port_number, RANGE_BEGIN, RANGE_END);
       t1.join();
     }
     else if (strcmp(cmd,"show") == 0){
@@ -143,7 +146,6 @@ void disp_menu(int port_number){
     else {
       printf("Bledna komenda. Wpisz \"help\" po pomoc.\n");
     }
-
   }
   std::terminate();
   return ;
